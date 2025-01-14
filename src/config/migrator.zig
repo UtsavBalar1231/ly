@@ -31,6 +31,7 @@ pub fn configFieldHandler(_: std.mem.Allocator, field: ini.IniField) ?ini.IniFie
             0 => "doom",
             1 => "matrix",
             2 => "raindrops",
+            3 => "starfield",
             else => "none",
         };
 

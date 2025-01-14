@@ -9,6 +9,7 @@ const interop = @import("interop.zig");
 const Doom = @import("animations/Doom.zig");
 const Matrix = @import("animations/Matrix.zig");
 const Raindrops = @import("animations/Raindrops.zig");
+const Starfield = @import("animations/Starfield.zig");
 const TerminalBuffer = @import("tui/TerminalBuffer.zig");
 const Session = @import("tui/components/Session.zig");
 const Text = @import("tui/components/Text.zig");
@@ -305,12 +306,14 @@ pub fn main() !void {
     var doom: Doom = undefined;
     var matrix: Matrix = undefined;
     var raindrops: Raindrops = undefined;
+    var starfield: Starfield = undefined;
 
     switch (config.animation) {
         .none => {},
         .doom => doom = try Doom.init(allocator, &buffer),
         .matrix => matrix = try Matrix.init(allocator, &buffer, config.cmatrix_fg),
         .raindrops => raindrops = try Raindrops.init(allocator, &buffer),
+        .starfield => starfield = try Starfield.init(allocator, &buffer, 69),
     }
     defer {
         switch (config.animation) {
@@ -318,6 +321,7 @@ pub fn main() !void {
             .doom => doom.deinit(),
             .matrix => matrix.deinit(),
             .raindrops => raindrops.deinit(),
+            .starfield => starfield.deinit(),
         }
     }
 
@@ -372,6 +376,9 @@ pub fn main() !void {
                     .raindrops => raindrops.realloc() catch {
                         try info_line.addMessage(lang.err_alloc, config.error_bg, config.error_fg);
                     },
+                    .starfield => starfield.realloc() catch {
+                        try info_line.addMessage(lang.err_alloc, config.error_bg, config.error_fg);
+                    },
                 }
 
                 update = true;
@@ -390,6 +397,7 @@ pub fn main() !void {
                         .doom => doom.draw(),
                         .matrix => matrix.draw(),
                         .raindrops => raindrops.draw(),
+                        .starfield => starfield.draw(),
                     }
                 }
 
@@ -551,6 +559,7 @@ pub fn main() !void {
                     .doom => doom.deinit(),
                     .matrix => matrix.deinit(),
                     .raindrops => raindrops.deinit(),
+                    .starfield => starfield.deinit(),
                 }
             }
         } else if (config.bigclock != .none and config.clock == null) {

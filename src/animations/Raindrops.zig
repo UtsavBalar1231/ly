@@ -6,10 +6,14 @@ const termbox = interop.termbox;
 
 const Raindrops = @This();
 
-pub const DROP_CHAR: u32 = '*'; // Character for raindrop
-pub const SPLASH_CHAR: u32 = '~'; // Character for splash effect
-pub const FRAME_DELAY: u64 = 4; // Frame delay for the animation
-pub const SPLASH_DURATION: u64 = 5; // Frames to display the splash
+// Character for raindrop
+pub const DROP_CHAR: u32 = '!';
+// Character for splash effect
+pub const SPLASH_CHAR: u32 = '*';
+// Frame delay for the animation
+pub const FRAME_DELAY: u64 = 5;
+// Frames to display the splash
+pub const SPLASH_DURATION: u64 = 6;
 
 pub const Drop = struct {
     x: usize,
@@ -62,10 +66,8 @@ pub fn draw(self: *Raindrops) void {
     const width = self.terminal_buffer.width;
     const height = self.terminal_buffer.height;
 
-    // Update drops
     for (self.drops) |*drop| {
         if (drop.splash_timer > 0) {
-            // Handle splash effect
             drop.splash_timer -= 1;
             if (drop.splash_timer == 0) {
                 _ = termbox.tb_set_cell(@intCast(drop.x), @intCast(height - 1), ' ', termbox.TB_DEFAULT, termbox.TB_DEFAULT);
@@ -74,7 +76,7 @@ pub fn draw(self: *Raindrops) void {
         }
 
         if (!drop.active) {
-            if (self.terminal_buffer.random.int(u16) % 40 == 0) {
+            if (self.terminal_buffer.random.int(u16) % (FRAME_DELAY * FRAME_DELAY) == 0) {
                 drop.x = self.terminal_buffer.random.int(u16) % width;
                 drop.y = 0;
                 drop.active = true;
@@ -93,14 +95,14 @@ pub fn draw(self: *Raindrops) void {
                 drop.splash_timer = SPLASH_DURATION;
             } else {
                 // Draw drop in new position with color gradient
-                const fg_color = termbox.TB_CYAN | @as(u16, @intCast((drop.y * 2) % 8));
-                _ = termbox.tb_set_cell(@intCast(drop.x), @intCast(drop.y), DROP_CHAR, @as(u16, @intCast(fg_color)), termbox.TB_DEFAULT);
+                const fg_color = termbox.TB_DEFAULT | ((@as(u16, @intCast(drop.y)) * 2) % 8);
+                _ = termbox.tb_set_cell(@intCast(drop.x), @intCast(drop.y), DROP_CHAR, @intCast(fg_color), termbox.TB_DEFAULT);
             }
         }
     }
 
-    // Add random wind effect
-    if (self.terminal_buffer.random.int(u16) % 10 == 0) {
+    // Add randomized wind effect
+    if (self.terminal_buffer.random.int(u16) % (FRAME_DELAY * 2) == 0) {
         for (self.drops) |*drop| {
             if (drop.active and drop.y > 0 and drop.y < height - 1) {
                 if (self.terminal_buffer.random.int(u16) % 2 == 0 and drop.x > 0) {
