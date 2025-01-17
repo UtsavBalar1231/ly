@@ -313,7 +313,7 @@ pub fn main() !void {
         .doom => doom = try Doom.init(allocator, &buffer),
         .matrix => matrix = try Matrix.init(allocator, &buffer, config.cmatrix_fg),
         .raindrops => raindrops = try Raindrops.init(allocator, &buffer),
-        .starfield => starfield = try Starfield.init(allocator, &buffer, 69),
+        .starfield => starfield = try Starfield.init(allocator, &buffer),
     }
     defer {
         switch (config.animation) {
